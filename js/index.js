@@ -11,7 +11,12 @@ const ispText = document.getElementById("isp");
 const apiKey = "at_Fql6DQcKuZWmJS5WDyZrm6TVq43wu";
 const apiIp = "https://api.ipify.org?format=json";
 
-var map = L.map("map")
+let iconLoca = L.icon({
+    iconUrl: "./images/icon-location.svg",
+    iconSize: [42, 50],
+});
+let map = L.map("map");
+let marker = L.marker([0, 0], { icon: iconLoca }).addTo(map);
 
 async function getIp() {
     const res = await fetch(apiIp);
@@ -35,18 +40,12 @@ async function getLocation(ip) {
 }
 
 function MapCoords(lat, lng) {
-    let iconLoca = L.icon({
-        iconUrl: "./images/icon-location.svg",
-        iconSize: [42, 50],
-    });
-
-    L.marker([lat, lng], { icon: iconLoca }).addTo(map)
+    marker.setLatLng([lat,lng])
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution:
             '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     }).addTo(map);
-
 }
 
 async function initialApp() {
@@ -66,7 +65,7 @@ form.addEventListener("submit", async (e) => {
     const ip = addres.value;
     const { location, isp } = await getLocation(ip);
     addres.value = "";
-    
+
     ipView.innerHTML = ip;
     locationAdd.innerHTML = `${location.region}, ${location.city}`;
     ispText.innerHTML = isp;
@@ -74,11 +73,10 @@ form.addEventListener("submit", async (e) => {
 
     map.flyTo([location.lat, location.lng], 13, {
         animate: true,
-        duration: 2 // in seconds
+        duration: 2, // in seconds
     });
 
     MapCoords(location.lat, location.lng);
-
 });
 
 window.addEventListener("DOMContentLoaded", async () => {
